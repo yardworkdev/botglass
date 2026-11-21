@@ -1,0 +1,21 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.rudibrdev/botglass",
+  "title": "botglass",
+  "description": "See a page as AI crawlers do: per-bot status, words received, robots rules and fixes.",
+  "version": "0.4.3",
+  "repository": {
+    "url": "https://github.com/yardworkdev/botglass",
+    "source": "github"
+  },
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "botglass",
+      "version": "0.4.3",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ]
+}
