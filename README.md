@@ -19,7 +19,7 @@ Two ways. As a shell command your agent runs:
 ```text
 Check whether AI crawlers can read our site. Run:
 
-  npx -y github:yardworkdev/botglass <URL> --render --compact
+  npx -y botglass <URL> --render --compact
 
 Summarise the verdicts in two sentences and list the fixes it gives.
 After we deploy a fix, run the same command again with --baseline .botglass.json
@@ -27,7 +27,7 @@ and tell me exactly what changed since the previous run.
 ```
 
 Or as an MCP server, so the agent calls it as a tool. Add this to your MCP config
-(Claude Code: `claude mcp add botglass -- npx -y github:yardworkdev/botglass mcp`;
+(Claude Code: `claude mcp add botglass -- npx -y botglass mcp`;
 Cursor and others: the same command in `.cursor/mcp.json` / `mcp.json`):
 
 ```json
@@ -35,7 +35,7 @@ Cursor and others: the same command in `.cursor/mcp.json` / `mcp.json`):
   "mcpServers": {
     "botglass": {
       "command": "npx",
-      "args": ["-y", "github:yardworkdev/botglass", "mcp"]
+      "args": ["-y", "botglass", "mcp"]
     }
   }
 }
@@ -50,10 +50,17 @@ second run into proof that the fix worked.
 ## Quick start
 
 ```bash
-npx github:yardworkdev/botglass https://example.com
+npx botglass https://example.com
 ```
 
-Requires Node 20 or newer. From a clone:
+Requires Node 20 or newer. To install globally instead:
+
+```bash
+npm install -g botglass
+botglass https://example.com
+```
+
+From a clone, when you want to change the code:
 
 ```bash
 git clone https://github.com/yardworkdev/botglass
@@ -197,7 +204,7 @@ and says `confidence: "heuristic"`.
 
 ```yaml
 - name: Crawler visibility gate
-  run: npx github:yardworkdev/botglass https://example.com --fail-on ua-blocked,error,cloaked
+  run: npx -y botglass https://example.com --fail-on ua-blocked,error,cloaked
 ```
 
 Exit codes: `0` pass, `1` gate failed, `2` usage or runtime error. `--json` writes a

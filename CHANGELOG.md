@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.4.3 — 2026-11-21
+
+- First npm publication, so the documented command is `npx botglass` instead of a
+  GitHub install spec. README install lines, the agent/MCP handoff and the CI gate
+  snippet now use the package name; the clone instructions stay for contributors.
+- `prepublishOnly` runs the test suite, so a package cannot be published from a
+  source tree that does not build and pass.
+- No behaviour or verdict changes: 0.4.2 output and scope claims are unchanged.
+
 ## 0.4.2 — 2026-11-05
 
 - Separate crawl permission from usage preferences: allowing retrieval while declining
