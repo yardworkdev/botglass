@@ -12,6 +12,18 @@ No account, no API key, no dashboard, no telemetry. One command, plain HTTP.
 It also reads **`Content-Usage`** training preferences in robots.txt, separately from
 crawl permission. HTTP response-header preferences are not measured; see the scope below.
 
+## Install
+
+The package is not on npm yet, so `npx botglass` and `npm install -g botglass` fail today.
+Until it is published, run the reviewed v0.4.3 tag from GitHub — Git and Node 20+ required;
+npm fetches the source, installs build dependencies and compiles TypeScript:
+
+```bash
+npx -y github:yardworkdev/botglass#v0.4.3 https://example.com
+```
+
+The examples below use that same command, so they work as written.
+
 ## Hand it to your agent
 
 Two ways. As a shell command your agent runs:
@@ -19,7 +31,7 @@ Two ways. As a shell command your agent runs:
 ```text
 Check whether AI crawlers can read our site. Run:
 
-  npx -y botglass <URL> --render --compact
+  npx -y github:yardworkdev/botglass#v0.4.3 <URL> --render --compact
 
 Summarise the verdicts in two sentences and list the fixes it gives.
 After we deploy a fix, run the same command again with --baseline .botglass.json
@@ -27,7 +39,7 @@ and tell me exactly what changed since the previous run.
 ```
 
 Or as an MCP server, so the agent calls it as a tool. Add this to your MCP config
-(Claude Code: `claude mcp add botglass -- npx -y botglass mcp`;
+(Claude Code: `claude mcp add botglass -- npx -y github:yardworkdev/botglass#v0.4.3 mcp`;
 Cursor and others: the same command in `.cursor/mcp.json` / `mcp.json`):
 
 ```json
@@ -35,7 +47,7 @@ Cursor and others: the same command in `.cursor/mcp.json` / `mcp.json`):
   "mcpServers": {
     "botglass": {
       "command": "npx",
-      "args": ["-y", "botglass", "mcp"]
+      "args": ["-y", "github:yardworkdev/botglass#v0.4.3", "mcp"]
     }
   }
 }
@@ -50,17 +62,11 @@ second run into proof that the fix worked.
 ## Quick start
 
 ```bash
-npx botglass https://example.com
+npx -y github:yardworkdev/botglass#v0.4.3 https://example.com
 ```
 
-Requires Node 20 or newer. To install globally instead:
-
-```bash
-npm install -g botglass
-botglass https://example.com
-```
-
-From a clone, when you want to change the code:
+Requires Node 20 or newer, plus Git for this install form. For a reusable command without
+the npx wrapper, keep a clone:
 
 ```bash
 git clone https://github.com/yardworkdev/botglass
@@ -69,6 +75,10 @@ npm install
 npm test          # builds, then runs the whole suite
 node dist/src/cli.js https://example.com
 ```
+
+Wherever the rest of this page says `botglass`, read
+`npx -y github:yardworkdev/botglass#v0.4.3` (or `node dist/src/cli.js` in a clone) until the
+npm package exists.
 
 ## What it prints
 
@@ -204,7 +214,7 @@ and says `confidence: "heuristic"`.
 
 ```yaml
 - name: Crawler visibility gate
-  run: npx -y botglass https://example.com --fail-on ua-blocked,error,cloaked
+  run: npx -y github:yardworkdev/botglass#v0.4.3 https://example.com --fail-on ua-blocked,error,cloaked
 ```
 
 Exit codes: `0` pass, `1` gate failed, `2` usage or runtime error. `--json` writes a
