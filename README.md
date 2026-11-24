@@ -24,6 +24,12 @@ npx -y github:yardworkdev/botglass#v0.4.3 https://example.com
 
 The examples below use that same command, so they work as written.
 
+**MCP clients that support MCP Bundles:** the same server also ships as `botglass-0.4.3.mcpb`
+([release asset](https://github.com/yardworkdev/botglass/releases/download/v0.4.3/botglass-0.4.3.mcpb))
+and is listed in the official MCP registry as `io.github.rudibrdev/botglass`
+([search](https://registry.modelcontextprotocol.io/?q=botglass)). It bundles the compiled
+server, so there is no npm or TypeScript step — only Node 20+ at runtime.
+
 ## Hand it to your agent
 
 Two ways. As a shell command your agent runs:
