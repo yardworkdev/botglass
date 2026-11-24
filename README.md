@@ -291,7 +291,8 @@ Layout: `src/audit.ts` (verdict rules, pure), `src/robots.ts`, `src/html.ts`,
 
 ## Sample report
 
-[docs/index.html](docs/index.html) — two live pages, eight bots, rendering on.
+[docs/demo.html](docs/demo.html) — two live pages, eight bots, rendering on. The site itself
+([yardworkdev.github.io/botglass](https://yardworkdev.github.io/botglass/)) links the report and the index.
 
 ## AI Access Index
 

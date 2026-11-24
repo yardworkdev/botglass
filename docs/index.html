@@ -3,104 +3,64 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>botglass report — 2 page(s)</title>
+<title>botglass — see your site as AI crawlers do</title>
+<meta name="description" content="One command shows what eight AI crawlers actually receive from your page, per-bot robots.txt rules, and the fix. Free, MIT, no account.">
 <style>
-:root{color-scheme:light dark;--bg:#fbfbfa;--fg:#16181d;--muted:#5c6470;--line:#e3e4e8;--card:#fff;
---ok:#0f7b3f;--okbg:#e6f5ec;--warn:#8a5a00;--warnbg:#fdf1d8;--bad:#a3231d;--badbg:#fbe7e6;--info:#125c8a;--infobg:#e4f1fa}
-@media (prefers-color-scheme:dark){:root{--bg:#14161a;--fg:#e9eaee;--muted:#a2a9b6;--line:#2a2e37;--card:#1b1e24;
---ok:#57d68f;--okbg:#15301f;--warn:#f0c164;--warnbg:#33280f;--bad:#ff8b80;--badbg:#3a1c1a;--info:#7cc4ec;--infobg:#12293a}}
+:root{color-scheme:light dark;--bg:#fbfbfa;--fg:#16181d;--muted:#5c6470;--line:#e3e4e8;--card:#fff}
+@media (prefers-color-scheme:dark){:root{--bg:#14161a;--fg:#e9eaee;--muted:#a2a9b6;--line:#2a2e37;--card:#1b1e24}}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.55 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-main{max-width:1000px;margin:0 auto;padding:32px 20px 64px}
-h1{font-size:26px;margin:0 0 4px}
-h2{font-size:18px;margin:0}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:760px;margin:0 auto;padding:56px 20px 72px}
+h1{font-size:32px;margin:0 0 8px;letter-spacing:-.01em}
+.lead{color:var(--muted);font-size:18px;margin:0 0 32px}
+h2{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:36px 0 10px;font-weight:600}
+p{margin:0 0 16px}
+pre{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto;font:13px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;margin:0 0 12px}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.92em}
+ul.links{list-style:none;padding:0;margin:0;border-top:1px solid var(--line)}
+ul.links li{border-bottom:1px solid var(--line)}
+ul.links a{display:block;padding:16px 4px;text-decoration:none;color:inherit}
+ul.links a:hover{padding-left:8px;transition:padding .12s ease}
+ul.links .t{font-weight:600}
+ul.links .d{color:var(--muted);font-size:14px}
+footer{margin-top:40px;color:var(--muted);font-size:13px}
 a{color:inherit}
-.sub{color:var(--muted);margin:0 0 24px}
-.counts{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 28px;padding:0;list-style:none}
-.counts li{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:4px 12px;font-size:13px}
-.page{border:1px solid var(--line);background:var(--card);border-radius:12px;padding:18px 18px 6px;margin:0 0 20px}
-.page h2{overflow-wrap:anywhere}
-.meta{color:var(--muted);font-size:13px;margin:6px 0 14px}
-table{width:100%;border-collapse:collapse;font-size:14px;margin:0 0 14px}
-th{text-align:left;font-weight:600;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.04em;
-border-bottom:1px solid var(--line);padding:0 8px 6px 0}
-td{border-bottom:1px solid var(--line);padding:7px 8px 7px 0;vertical-align:top}
-tr:last-child td{border-bottom:none}
-.badge{display:inline-block;border-radius:6px;padding:1px 8px;font-size:12px;font-weight:600;white-space:nowrap}
-.v-ok{color:var(--ok);background:var(--okbg)}
-.v-js-dependent,.v-cloaked{color:var(--warn);background:var(--warnbg)}
-.v-robots-blocked{color:var(--info);background:var(--infobg)}
-.v-ua-blocked,.v-error{color:var(--bad);background:var(--badbg)}
-.reason{color:var(--muted);font-size:13px}
-.findings{list-style:none;padding:0;margin:0 0 16px}
-.findings li{padding:8px 12px;border-radius:8px;margin:0 0 6px;font-size:14px;background:var(--infobg);color:var(--info)}
-.findings li.warn{background:var(--warnbg);color:var(--warn)}
-.findings li.error{background:var(--badbg);color:var(--bad)}
-details{margin:0 0 14px;font-size:14px}
-summary{cursor:pointer;color:var(--muted)}
-code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;overflow-wrap:anywhere}
-footer{color:var(--muted);font-size:13px;border-top:1px solid var(--line);padding-top:16px;margin-top:8px}
 </style>
 </head>
 <body>
 <main>
-<h1>botglass 0.4.0</h1>
-<p class="sub">2 page(s) fetched as a browser and as 8 crawlers · render on · 2026-11-04T19:21:37.410Z</p>
-<ul class="counts"><li>8 × <span class="badge v-ok" title="server-rendered and allowed">ok</span></li><li>8 × <span class="badge v-js-dependent" title="content needs JavaScript, which this crawler does not run">js-dependent</span></li></ul>
-<p class="meta">Gate: passed (no failing verdicts).</p>
-<section class="page">
-  <h2><a href="https://excalidraw.com/">https://excalidraw.com/</a></h2>
-  <p class="meta">HTTP 200 · 3 words in the raw HTML · rendered 80 words · checked 2026-11-04T19:21:43.665Z</p>
-  <table>
-    <thead><tr><th>crawler</th><th>status</th><th>words</th><th>verdict</th><th>why</th></tr></thead>
-    <tbody>
-<tr><td><code>GPTBot</code></td><td>200</td><td>3</td><td><span class="badge v-js-dependent" title="content needs JavaScript, which this crawler does not run">js-dependent</span></td><td class="reason">raw HTML carries 3 of the 80 words a browser renders (96% missing)</td></tr>
-<tr><td><code>OAI-SearchBot</code></td><td>200</td><td>3</td><td><span class="badge v-js-dependent" title="content needs JavaScript, which this crawler does not run">js-dependent</span></td><td class="reason">raw HTML carries 3 of the 80 words a browser renders (96% missing)</td></tr>
-<tr><td><code>ChatGPT-User</code></td><td>200</td><td>3</td><td><span class="badge v-js-dependent" title="content needs JavaScript, which this crawler does not run">js-dependent</span></td><td class="reason">raw HTML carries 3 of the 80 words a browser renders (96% missing)</td></tr>
-<tr><td><code>ClaudeBot</code></td><td>200</td><td>3</td><td><span class="badge v-js-dependent" title="content needs JavaScript, which this crawler does not run">js-dependent</span></td><td class="reason">raw HTML carries 3 of the 80 words a browser renders (96% missing)</td></tr>
-<tr><td><code>PerplexityBot</code></td><td>200</td><td>3</td><td><span class="badge v-js-dependent" title="content needs JavaScript, which this crawler does not run">js-dependent</span></td><td class="reason">raw HTML carries 3 of the 80 words a browser renders (96% missing)</td></tr>
-<tr><td><code>CCBot</code></td><td>200</td><td>3</td><td><span class="badge v-js-dependent" title="content needs JavaScript, which this crawler does not run">js-dependent</span></td><td class="reason">raw HTML carries 3 of the 80 words a browser renders (96% missing)</td></tr>
-<tr><td><code>Googlebot</code></td><td>200</td><td>3</td><td><span class="badge v-js-dependent" title="content needs JavaScript, which this crawler does not run">js-dependent</span></td><td class="reason">raw HTML carries 3 of the 80 words a browser renders (96% missing)</td></tr>
-<tr><td><code>meta-externalagent</code></td><td>200</td><td>3</td><td><span class="badge v-js-dependent" title="content needs JavaScript, which this crawler does not run">js-dependent</span></td><td class="reason">raw HTML carries 3 of the 80 words a browser renders (96% missing)</td></tr>
-    </tbody>
-  </table>
-  <ul class="findings">
-<li class="warn">JavaScript-only content for GPTBot, OAI-SearchBot, ChatGPT-User, ClaudeBot, PerplexityBot, CCBot, Googlebot, meta-externalagent: 96% of the text a browser renders (3 of 80 words) never reaches them, because these crawlers do not run JavaScript.</li>
-<li class="">First missing sentence: &quot;Your drawings are saved in your browser&#39;s storage.&quot;</li>
-<li class="">Googlebot is the exception: it renders JavaScript before indexing, so its row is a lower bound for Google. GPTBot, ClaudeBot, PerplexityBot and the other AI fetchers stop at the raw HTML.</li>
-<li class="">Only 3 words of text in the raw HTML. Thin pages are hard for any crawler to make sense of.</li>
-  </ul>
-  <details><summary>Text that only exists after JavaScript runs (45 words missing)</summary><ul><li>Your drawings are saved in your browser&#39;s storage.</li><li>Browser storage can be cleared unexpectedly.</li><li>Save your work to a file regularly to avoid losing it.</li><li>Pick a tool &amp; Start drawing!</li><li>To move canvas, hold Scroll wheel or Space while dragging, or use the hand tool</li></ul></details>
-  <p class="meta">robots.txt <code>https://excalidraw.com/robots.txt</code> (HTTP 200) is read for each bot.</p>
-</section>
-<section class="page">
-  <h2><a href="https://nextjs.org/">https://nextjs.org/</a></h2>
-  <p class="meta">HTTP 200 · 653 words in the raw HTML · rendered 619 words · checked 2026-11-04T19:21:50.161Z</p>
-  <table>
-    <thead><tr><th>crawler</th><th>status</th><th>words</th><th>verdict</th><th>why</th></tr></thead>
-    <tbody>
-<tr><td><code>GPTBot</code></td><td>200</td><td>653</td><td><span class="badge v-ok" title="server-rendered and allowed">ok</span></td><td class="reason">server-rendered content, bot allowed</td></tr>
-<tr><td><code>OAI-SearchBot</code></td><td>200</td><td>653</td><td><span class="badge v-ok" title="server-rendered and allowed">ok</span></td><td class="reason">server-rendered content, bot allowed</td></tr>
-<tr><td><code>ChatGPT-User</code></td><td>200</td><td>653</td><td><span class="badge v-ok" title="server-rendered and allowed">ok</span></td><td class="reason">server-rendered content, bot allowed</td></tr>
-<tr><td><code>ClaudeBot</code></td><td>200</td><td>653</td><td><span class="badge v-ok" title="server-rendered and allowed">ok</span></td><td class="reason">server-rendered content, bot allowed</td></tr>
-<tr><td><code>PerplexityBot</code></td><td>200</td><td>653</td><td><span class="badge v-ok" title="server-rendered and allowed">ok</span></td><td class="reason">server-rendered content, bot allowed</td></tr>
-<tr><td><code>CCBot</code></td><td>200</td><td>653</td><td><span class="badge v-ok" title="server-rendered and allowed">ok</span></td><td class="reason">server-rendered content, bot allowed</td></tr>
-<tr><td><code>Googlebot</code></td><td>200</td><td>653</td><td><span class="badge v-ok" title="server-rendered and allowed">ok</span></td><td class="reason">server-rendered content, bot allowed</td></tr>
-<tr><td><code>meta-externalagent</code></td><td>200</td><td>653</td><td><span class="badge v-ok" title="server-rendered and allowed">ok</span></td><td class="reason">server-rendered content, bot allowed</td></tr>
-    </tbody>
-  </table>
-  <ul class="findings">
-<li class="">No crawler-visible problem found on this URL.</li>
-  </ul>
-  <details><summary>Text that only exists after JavaScript runs (18 words missing)</summary><ul><li>This site uses tracking technologies.</li><li>You may opt in or opt out of the use of these technologies.</li></ul></details>
-  <p class="meta">no robots.txt at <code>https://nextjs.org/robots.txt</code> (HTTP 404), so everything is allowed.</p>
-</section>
-<footer>
-Verdicts are heuristics unless marked otherwise: <strong>js-dependent</strong> compares the raw HTML with a
-rendered DOM, <strong>cloaked</strong> compares word similarity against a plain-browser fetch. User-Agent strings
-are published by each vendor and dated in the README. Generated 2026-11-04T19:21:50.161Z.
-<p><a href="./ai-access-index/">AI Access Index</a> — what the top 300 sites tell AI crawlers, measured with this tool.</p>
-</footer>
+<h1>botglass</h1>
+<p class="lead">See your site exactly as AI crawlers see it.</p>
+
+<p>AI crawlers fetch your HTML and never run JavaScript. A React, Next.js or Vue page can look finished to you and near-empty to GPTBot, ClaudeBot and PerplexityBot. botglass fetches the same URL as a normal browser and as eight crawlers, compares the text each one actually receives, checks robots.txt per bot, and prints one verdict per crawler.</p>
+<p>No account, no API key, no dashboard, no telemetry. One command, plain HTTP.</p>
+
+<h2>Run it</h2>
+<pre><code>npm install -g https://github.com/yardworkdev/botglass/releases/download/v0.4.3/botglass-0.4.3.tgz
+botglass https://example.com</code></pre>
+<p>Node 20+. The built package installs without the npm registry; the <a href="https://github.com/yardworkdev/botglass#install">README</a> has the no-install form and the MCP setup.</p>
+
+<h2>Look at</h2>
+<ul class="links">
+  <li><a href="/botglass/ai-access-index/">
+    <span class="t">AI Access Index</span><br>
+    <span class="d">What the 300 most-visited domains tell AI crawlers — measured November 2026: 28% of retrieved robots responses block at least one AI crawler.</span>
+  </a></li>
+  <li><a href="/botglass/demo.html">
+    <span class="t">An example report</span><br>
+    <span class="d">Two live pages, eight crawlers, rendering on — including a page whose text never reaches them.</span>
+  </a></li>
+  <li><a href="https://github.com/yardworkdev/botglass">
+    <span class="t">Source, docs and changelog</span><br>
+    <span class="d">MIT, on GitHub. Issues and pull requests welcome.</span>
+  </a></li>
+  <li><a href="https://registry.modelcontextprotocol.io/?q=botglass">
+    <span class="t">MCP registry listing</span><br>
+    <span class="d">Install the same checker as an MCP server for an agent, as a bundle — no npm, no TypeScript step.</span>
+  </a></li>
+</ul>
+
+<footer>Made by <a href="https://yardwork.dev">Yardwork</a>. Free, MIT, and yours to inspect.</footer>
 </main>
 </body>
 </html>
