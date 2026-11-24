@@ -14,15 +14,24 @@ crawl permission. HTTP response-header preferences are not measured; see the sco
 
 ## Install
 
-The package is not on npm yet, so `npx botglass` and `npm install -g botglass` fail today.
-Until it is published, run the reviewed v0.4.3 tag from GitHub — Git and Node 20+ required;
-npm fetches the source, installs build dependencies and compiles TypeScript:
+One command, no account and no registry: install the built package from this repository's
+v0.4.3 release. Node 20+ is the only requirement.
+
+```bash
+npm install -g https://github.com/yardworkdev/botglass/releases/download/v0.4.3/botglass-0.4.3.tgz
+botglass https://example.com
+```
+
+Or run it without installing anything (Git and Node 20+, because npm fetches the source and
+compiles TypeScript):
 
 ```bash
 npx -y github:yardworkdev/botglass#v0.4.3 https://example.com
 ```
 
-The examples below use that same command, so they work as written.
+Both run the same v0.4.3 code. The npm registry does not carry the package yet, so plain
+`npm install -g botglass` and `npx botglass` fail today; this page switches to them once it does.
+The examples below use the `npx` form, which needs no install.
 
 **MCP clients that support MCP Bundles:** the same server also ships as `botglass-0.4.3.mcpb`
 ([release asset](https://github.com/yardworkdev/botglass/releases/download/v0.4.3/botglass-0.4.3.mcpb))
