@@ -25,7 +25,7 @@ const VERDICT_COPY: Record<Verdict, { label: string; hint: string }> = {
   cloaked: { label: "cloaked", hint: "different text than a browser gets" },
   "robots-blocked": { label: "robots-blocked", hint: "robots.txt asks it to stay away" },
   "ua-blocked": { label: "ua-blocked", hint: "server refuses the bot user agent" },
-  error: { label: "error", hint: "fetch failed or the page itself fails" },
+  error: { label: "error", hint: "fetch failed, the URL itself fails, or the edge refused every client" },
 };
 
 const CSS = `

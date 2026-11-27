@@ -38,6 +38,8 @@ function report() {
       robots: { available: true, allowed: true, rule: null, robotsUrl: "u", status: 200 },
       similarityToBaseline: null,
       error: null,
+      server: null,
+      mitigation: null,
     },
     bots: [
       {
@@ -54,6 +56,8 @@ function report() {
         robots: { available: true, allowed: true, rule: null, robotsUrl: "u", status: 200 },
         similarityToBaseline: 1,
         error: null,
+        server: null,
+        mitigation: null,
       },
     ],
     render: { ok: true, error: null, text: "rendered", wordCount: 30, title: "A page" },

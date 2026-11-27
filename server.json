@@ -3,7 +3,7 @@
   "name": "io.github.rudibrdev/botglass",
   "title": "botglass",
   "description": "See a page as AI crawlers do: per-bot status, words received, robots rules and fixes.",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "repository": {
     "url": "https://github.com/yardworkdev/botglass",
     "source": "github"
@@ -12,7 +12,7 @@
     {
       "registryType": "npm",
       "identifier": "botglass",
-      "version": "0.4.3",
+      "version": "0.4.4",
       "transport": {
         "type": "stdio"
       }

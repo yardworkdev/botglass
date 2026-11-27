@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.4.4 — 2026-11-27
+
+- **A refusal at the edge is no longer reported as a broken site.** When a crawler and a
+  plain browser both receive HTTP 401/403/429/451, the verdict reason now says the edge
+  refused both, and the fix line points at bot management, rate limits or authentication
+  at the edge. Before this, `botglass https://medium.com` told people to "fix reachability,
+  TLS or the redirect chain" for a site whose only problem is a Cloudflare challenge;
+  wsj.com (401 to everyone) and bloomberg.com were misdiagnosed the same way.
+- The report records the `Server` header and a `mitigation` field naming the bot-management
+  product, and only from that product's own signature (`cf-mitigated`, `__cf_chl`,
+  DataDome headers or interstitial). A refusal from an unknown server names no product.
+- A 4xx/5xx the crawler got while a browser loaded the page is now described as an error
+  specific to those crawlers, and a genuinely unreachable URL keeps the old advice.
+- Fix lines for several crawlers collapse to a count so the instruction survives the
+  150-character budget the terminal prints them in; the per-bot list stays in the JSON.
+- `server` and `mitigation` are additive fields in `BotResult`: the JSON schema version is
+  unchanged, and old baselines and reports still read.
+
 ## 0.4.3 — 2026-11-21
 
 - First npm publication, so the documented command is `npx botglass` instead of a

@@ -63,6 +63,49 @@ test("a page that fails for browsers too is an error, not a bot problem", async 
   assert.match(report.verdicts[0]?.reason ?? "", /the URL itself fails/);
 });
 
+/**
+ * Regression: a site behind edge bot management answers 403 to the crawler *and*
+ * to the plain browser, which used to be reported as "the URL itself fails" with
+ * advice to fix reachability, TLS or the redirect chain. Nothing about the URL is
+ * broken there, and the advice sent people off to check their certificates.
+ * Seen live on medium.com, wsj.com and bloomberg.com on 2026-11-27.
+ */
+test("an edge that refuses crawler and browser alike is named as a refusal", async () => {
+  const report = await auditUrl(`${fixture.base}/challenge`, one("GPTBot"), options);
+  const verdict = report.verdicts[0];
+  assert.equal(verdict?.verdict, "error", "the page was never delivered, so there is no content verdict");
+  assert.equal(verdict?.confidence, "measured");
+  assert.match(verdict?.reason ?? "", /HTTP 403/);
+  assert.match(verdict?.reason ?? "", /plain browser/);
+  assert.doesNotMatch(verdict?.reason ?? "", /the URL itself fails/);
+
+  const text = report.advice.join(" ");
+  assert.match(text, /bot management/i);
+  assert.doesNotMatch(text, /TLS/, "a 403 challenge is not a transport failure");
+  assert.doesNotMatch(text, /reachability/);
+});
+
+test("a refusal with no edge signature is still a refusal, not an outage", async () => {
+  const report = await auditUrl(`${fixture.base}/refused`, one("GPTBot"), options);
+  assert.match(report.verdicts[0]?.reason ?? "", /HTTP 403/);
+  assert.doesNotMatch(report.verdicts[0]?.reason ?? "", /the URL itself fails/);
+  assert.match(report.advice.join(" "), /refus/i);
+  assert.doesNotMatch(report.advice.join(" "), /TLS/);
+});
+
+test("a rate limit answered to everyone is reported as a rate limit", async () => {
+  const report = await auditUrl(`${fixture.base}/busy`, one("GPTBot"), options);
+  assert.match(report.verdicts[0]?.reason ?? "", /HTTP 429/);
+  assert.match(report.advice.join(" "), /429|rate/i);
+  assert.doesNotMatch(report.advice.join(" "), /TLS/);
+});
+
+test("a genuine transport failure still gets the transport advice", async () => {
+  const report = await auditUrl(`http://127.0.0.1:1/unreachable`, one("GPTBot"), options);
+  assert.equal(report.verdicts[0]?.verdict, "error");
+  assert.match(report.advice.join(" "), /TLS|reachab/i);
+});
+
 test("bot-specific content is flagged as cloaked", async () => {
   const report = await auditUrl(`${fixture.base}/cloaked`, one("GPTBot"), options);
   const verdict = report.verdicts[0];
@@ -153,6 +196,8 @@ function fakeBot(overrides: Partial<BotResult> = {}): BotResult {
     robots: { available: true, allowed: true, rule: null, robotsUrl: "https://example.com/robots.txt", status: 200 },
     similarityToBaseline: 0.99,
     error: null,
+    server: null,
+    mitigation: null,
     ...overrides,
   };
 }
