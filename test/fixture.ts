@@ -26,6 +26,11 @@ would read in a normal browser. Words like sale, voucher and bargain appear repe
 here, while the browser version contains none of them at all. A comparison of the two
 texts should come out far below the similarity threshold used for the cloaking verdict.`;
 
+/** The shape a Cloudflare bot-management challenge answers with, header included. */
+const CHALLENGE = `<!doctype html><html lang="en-US"><head><title>Just a moment...</title><meta http-equiv="refresh" content="360"></head>
+<body><div class="cf-browser-verification"><h1>Just a moment...</h1><noscript>You need to enable JavaScript to continue.</noscript></div>
+<script>window.__cf_chl_opt={cT:1,cN:"abc"};</script></body></html>`;
+
 function page(title: string, body: string): string {
   return `<!doctype html><html lang="en"><head><meta charset="utf-8">
 <title>${title}</title>
@@ -129,6 +134,21 @@ export async function startFixture(): Promise<Fixture> {
         return /bot|crawl|spider/i.test(ua)
           ? send(403, page("Forbidden", "<p>No bots.</p>"))
           : send(200, page("Server-rendered article", paragraphs(ARTICLE)));
+      // An edge in front of the origin that refuses everyone, crawler and browser
+      // alike, with a bot-management challenge page.
+      case "/challenge":
+        res.writeHead(403, {
+          "content-type": "text/html; charset=utf-8",
+          server: "cloudflare",
+          "cf-mitigated": "challenge",
+          "cf-ray": "a61057252fc4e862",
+        });
+        return res.end(CHALLENGE);
+      // The same refusal with no edge signature at all: still a refusal, not an outage.
+      case "/refused":
+        return send(403, page("Access denied", "<p>You have been blocked.</p>"));
+      case "/busy":
+        return send(429, page("Too many requests", "<p>Slow down.</p>"));
       case "/secret":
         return send(200, page("Secret", paragraphs(ARTICLE)));
       case "/claude-off":

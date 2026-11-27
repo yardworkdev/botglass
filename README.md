@@ -133,7 +133,7 @@ The exit code stays 0 until you ask for a gate with `--fail-on` or `--max-js-onl
 | `cloaked` | the crawler gets different text than a browser | 5-word-shingle Jaccard similarity below 0.5, both versions at least 30 words, crawler sees less text |
 | `robots-blocked` | robots.txt forbids this crawler here | RFC 9309 matching: longest path wins, `Allow` wins ties, `*` groups respected |
 | `ua-blocked` | the server refuses the crawler | 401/403/406/429/451 for the bot while a browser gets 2xx |
-| `error` | nothing useful to say about the content | fetch failure or the URL fails for a browser too |
+| `error` | nothing useful to say about the content | no answer at all, the URL fails for a browser too, or the edge refused the crawler and a plain browser alike (401/403/406/429/451) |
 
 Every verdict carries the numbers that produced it, and the JSON and HTML reports keep
 `confidence: "measured"` or `"heuristic"` so a heuristic is never mistaken for a fact.
@@ -269,6 +269,11 @@ it after comparing, so the next run measures against the newest state.
   from heuristic to measured.
 - **One fetch is a snapshot.** CDNs, A/B tests and bot management change answers. The
   report prints the fetch time for that reason.
+- **A refusal is not an outage.** When the crawler and a plain browser both get
+  401/403/429/451, the verdict says the edge refused both instead of blaming your TLS.
+  The bot-management product is named only where its own signature is in the response
+  (`cf-mitigated`, `__cf_chl`, DataDome headers), so `server: cloudflare` alone never
+  turns a plain 403 into "Cloudflare".
 - **JavaScript-rendered text is not "visible to crawlers".** Googlebot renders JS; GPTBot,
   ClaudeBot and PerplexityBot do not. A green Googlebot row does not help the others.
 
@@ -276,14 +281,15 @@ it after comparing, so the next run measures against the newest state.
 
 ```bash
 npm install
-npm test              # 140 tests: unit, fixture-server integration, real CLI subprocess
+npm test              # 156 tests: unit, fixture-server integration, real CLI subprocess
 npm run build         # tsc -> dist/
 ```
 
 The test suite starts a local fixture server with a server-rendered page, a client-only
-shell, a page that cloaks per User-Agent, a bot-only 403, a robots-blocked path, a redirect
-and a 404, then asserts every verdict and the CLI exit codes against it. No network access
-is needed to run the tests.
+shell, a page that cloaks per User-Agent, a bot-only 403, an edge challenge that refuses
+every client, a 429 to everyone, a robots-blocked path, a redirect and a 404, then asserts
+every verdict, the advice line printed for it and the CLI exit codes against it. No network
+access is needed to run the tests.
 
 Layout: `src/audit.ts` (verdict rules, pure), `src/robots.ts`, `src/html.ts`,
 `src/diff.ts` (shingles and missing sentences), `src/report/` (text, HTML, gate),

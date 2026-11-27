@@ -8,7 +8,7 @@
 
 import { BASELINE, type BotIdentity } from "./bots.js";
 import { extractPage, looksLikeSpaShell } from "./html.js";
-import { fetchAs, originOf, sleep } from "./fetch.js";
+import { fetchAs, isRefusal, originOf, sleep } from "./fetch.js";
 import { isAllowed, parseRobots, pathWithQueryOf, type RobotsGroup } from "./robots.js";
 import { resolveUsage } from "./aipref.js";
 import { jsOnlyReport, similarity } from "./diff.js";
@@ -23,8 +23,6 @@ import type {
   RobotsVerdict,
   Verdict,
 } from "./types.js";
-
-const UA_BLOCK_STATUSES = new Set([401, 403, 406, 429, 451]);
 
 export interface RobotsCache {
   available: boolean;
@@ -126,6 +124,18 @@ export function decideVerdict(input: VerdictInput): BotVerdict {
 
   if (bot.status >= 400) {
     if (baseline.status !== null && baseline.status >= 400) {
+      // A refusal to a plain browser too is bot management at the edge, not an
+      // outage. Telling people to check TLS or their redirect chain here was a
+      // wrong diagnosis on sites such as medium.com and bloomberg.com.
+      if (isRefusal(bot.status) && isRefusal(baseline.status)) {
+        const edge = bot.mitigation ?? baseline.mitigation;
+        return {
+          bot: name,
+          verdict: "error",
+          reason: `HTTP ${bot.status} to the crawler and HTTP ${baseline.status} to a plain browser: the edge in front of the origin refused both${edge ? ` (${edge})` : ""}`,
+          confidence: "measured",
+        };
+      }
       return {
         bot: name,
         verdict: "error",
@@ -133,7 +143,7 @@ export function decideVerdict(input: VerdictInput): BotVerdict {
         confidence: "measured",
       };
     }
-    if (UA_BLOCK_STATUSES.has(bot.status)) {
+    if (isRefusal(bot.status)) {
       return {
         bot: name,
         verdict: "ua-blocked",
@@ -229,9 +239,12 @@ export function collectFindings(
       message: `A browser cannot load this URL either (${baseline.error}). Fix that first.`,
     });
   } else if (baseline.status !== null && baseline.status >= 400) {
+    const what = isRefusal(baseline.status)
+      ? "The edge in front of your origin refused a normal browser too"
+      : "The URL returns a browser error too";
     findings.push({
       level: "error",
-      message: `The URL returns HTTP ${baseline.status} for a normal browser. Nothing below is meaningful until that is fixed.`,
+      message: `${what} (HTTP ${baseline.status}). Nothing below is a content verdict until that is answered.`,
     });
   }
 
@@ -334,6 +347,8 @@ function toBotResult(
     similarityToBaseline:
       baselineText !== null && hasText ? similarity(page.text, baselineText) : null,
     error: outcome.error,
+    server: outcome.server,
+    mitigation: outcome.mitigation,
   };
 }
 

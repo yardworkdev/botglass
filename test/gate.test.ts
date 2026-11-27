@@ -18,6 +18,8 @@ function bot(name: string, verdict: Verdict): BotResult {
     robots: { available: false, allowed: true, rule: null, robotsUrl: "u", status: 404 },
     similarityToBaseline: 1,
     error: null,
+    server: null,
+    mitigation: null,
   };
 }
 

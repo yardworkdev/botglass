@@ -6,6 +6,7 @@
  * act on this list, so it stays short and every line names a change.
  */
 
+import { isRefusal } from "./fetch.js";
 import type { BotVerdict, PageReport, Verdict } from "./types.js";
 
 const THIN_PAGE_WORDS = 50;
@@ -16,6 +17,16 @@ function listBots(bots: string[]): string {
   if (bots.length === 1) return bots[0] as string;
   if (bots.length === 2) return `${bots[0]} and ${bots[1]}`;
   if (bots.length <= 4) return `${bots.slice(0, -1).join(", ")} and ${bots[bots.length - 1]}`;
+  return `${bots.length} crawlers`;
+}
+
+/**
+ * Who a fix line is about. The per-bot list lives in the JSON and in the verdict
+ * table; a fix line that names four crawlers individually overflows the width
+ * the terminal prints it in, so beyond one crawler the count carries.
+ */
+function collapseBots(bots: string[]): string {
+  if (bots.length === 1) return bots[0] as string;
   return `${bots.length} crawlers`;
 }
 
@@ -56,9 +67,9 @@ function usageAdvice(page: PageReport): string[] {
 }
 
 /** Page-level advice that is not tied to a single bot. */
-function pageAdvice(page: PageReport, alreadyMentionsJs: boolean): string[] {
+function pageAdvice(page: PageReport, alreadyMentionsJs: boolean, alreadyMentionsEdge: boolean): string[] {
   const out: string[] = [];
-  if (page.httpStatus !== null && page.httpStatus >= 400) {
+  if (page.httpStatus !== null && page.httpStatus >= 400 && !alreadyMentionsEdge) {
     out.push(`The page itself returned HTTP ${page.httpStatus} to a normal browser.`);
   }
   const baselineWords = page.baseline.wordCount;
@@ -81,8 +92,39 @@ export function adviceForPage(page: PageReport): string[] {
   const out: string[] = [];
 
   const errors = groups.get("error");
+  let edgeCovered = false;
   if (errors) {
-    out.push(`The request failed for ${listBots(errors)}; fix reachability, TLS or the redirect chain before judging crawler access.`);
+    const statusOf = new Map(page.bots.map((bot) => [bot.bot, bot.status]));
+    const unreachable = errors.filter((name) => statusOf.get(name) === null);
+    const refused = errors.filter(
+      (name) => isRefusal(statusOf.get(name) ?? null) && isRefusal(page.baseline.status),
+    );
+    const answered = errors.filter(
+      (name) => statusOf.get(name) !== null && !refused.includes(name),
+    );
+
+    if (refused.length > 0) {
+      const status = statusOf.get(refused[0] as string) ?? null;
+      const edge = page.bots.find((bot) => refused.includes(bot.bot) && bot.mitigation !== null)?.mitigation ?? null;
+      const cause = status === 429 ? "rate limits" : status === 401 ? "authentication" : "bot management";
+      edgeCovered = true;
+      out.push(
+        `${collapseBots(refused)} ${refused.length === 1 ? "was" : "were"} refused HTTP ${status}${edge ? ` by ${edge}` : ""}; a plain browser got the same. Check ${cause} at your edge, not robots.txt.`,
+      );
+    }
+    if (answered.length > 0) {
+      const status = statusOf.get(answered[0] as string) ?? null;
+      out.push(
+        page.baseline.status !== null && page.baseline.status >= 400
+          ? `The URL itself answers HTTP ${page.baseline.status} to a normal browser; fix the page before judging crawler access.`
+          : `${collapseBots(answered)} ${answered.length === 1 ? "got" : "were given"} HTTP ${status} while a browser loads the page; that is an error specific to these crawlers, most likely a rule at the edge rather than in the site.`,
+      );
+    }
+    if (unreachable.length > 0) {
+      out.push(
+        `The request failed for ${listBots(unreachable)}; fix reachability, TLS or the redirect chain before judging crawler access.`,
+      );
+    }
   }
   const blocked = groups.get("ua-blocked");
   if (blocked) {
@@ -114,7 +156,7 @@ export function adviceForPage(page: PageReport): string[] {
     );
   }
 
-  out.push(...pageAdvice(page, js !== undefined));
+  out.push(...pageAdvice(page, js !== undefined, edgeCovered));
   out.push(...usageAdvice(page));
   return out.slice(0, 5);
 }

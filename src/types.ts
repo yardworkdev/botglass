@@ -66,6 +66,13 @@ export interface BotResult {
   /** Jaccard similarity of 5-word shingles vs the baseline browser text, 0..1. */
   similarityToBaseline: number | null;
   error: string | null;
+  /** `Server` header of the response, e.g. "cloudflare". Null when unseen. */
+  server: string | null;
+  /**
+   * Bot-management product recognised in the response ("Cloudflare challenge").
+   * Null means no signature was recognised, not that there is no edge.
+   */
+  mitigation: string | null;
 }
 
 export interface RobotsVerdict {
