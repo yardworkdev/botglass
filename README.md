@@ -101,7 +101,7 @@ Real output, from `botglass https://excalidraw.com https://nextjs.org --render` 
 nextjs.org rows are trimmed):
 
 ```
-botglass 0.3.0  2 page(s), 8 bots, render on
+botglass 0.4.3  2 page(s), 8 bots, render on
 
 https://excalidraw.com/
   HTTP 200, 3 words in raw HTML, 80 words rendered
@@ -221,6 +221,11 @@ npm install --save-dev playwright
 npx playwright install chromium
 botglass https://example.com --render --samples
 ```
+
+Run it from the project where you installed Playwright: `botglass` looks there first, so
+this works with the global install and with the `npx` form above, not just from a clone.
+If Playwright is installed but its browser is not, the tool names the command that fixes
+it instead of failing quietly.
 
 Without Playwright the tool still runs; `js-dependent` then comes from the shell heuristic
 and says `confidence: "heuristic"`.
