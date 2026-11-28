@@ -1,10 +1,28 @@
 # Changelog
 
+## Unreleased
+
+- `--render` works from the installs the README documents. Playwright is now looked for in
+  the directory botglass runs in (then `INIT_CWD`) before the module's own dependency tree,
+  so the `npx -y github:…` form and a global install find the Playwright installed in your
+  project instead of reporting it missing. Measured proof: the same command that answered
+  "Playwright is not installed" now prints the rendered word count.
+- A Playwright install without its browser now says `npx playwright install chromium` instead
+  of a raw `browserType.launch` error.
+- A render that fails no longer turns an application shell into a measured `ok`: the shell
+  heuristic applies whenever no render succeeded, so a 3-word app shell stays `js-dependent`
+  with `confidence: "heuristic"` rather than claiming server-rendered content.
+- Docs: the sample output header says 0.4.3 (it still said 0.3.0), the `--render` section
+  says where Playwright is looked up, and the 0.4.3 entry below is corrected — the npm
+  registry has no botglass package, so installs use the release asset.
+
 ## 0.4.3 — 2026-11-21
 
 - First npm publication, so the documented command is `npx botglass` instead of a
   GitHub install spec. README install lines, the agent/MCP handoff and the CI gate
   snippet now use the package name; the clone instructions stay for contributors.
+  **Corrected 28 Nov 2026: the registry never received the package (`npm view botglass`
+  is a 404), so the documented installs use the v0.4.3 release asset.**
 - `prepublishOnly` runs the test suite, so a package cannot be published from a
   source tree that does not build and pass.
 - No behaviour or verdict changes: 0.4.2 output and scope claims are unchanged.

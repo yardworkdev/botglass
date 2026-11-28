@@ -363,7 +363,6 @@ export async function auditUrl(
   const baseline = toBotResult(BASELINE, baselineOutcome, robotsForAll, null);
   const baselineText = baseline.text.length > 0 ? baseline.text : null;
   const shellCheck = looksLikeSpaShell(baselineOutcome.body, baseline.wordCount);
-  const spaShell = shellCheck.shell && !options.renderer;
 
   const results: BotResult[] = [];
   for (const bot of bots) {
@@ -394,6 +393,11 @@ export async function auditUrl(
       renderError = err instanceof Error ? err.message : String(err);
     }
   }
+
+  // A shell stays a heuristic only when no render actually succeeded. If a
+  // renderer was configured but failed, claiming "server-rendered content" would
+  // be a measured-sounding answer to a question nobody measured.
+  const spaShell = shellCheck.shell && jsOnly === null;
 
   const verdicts = results.map((bot) => decideVerdict({ bot, baseline, jsOnly, spaShell }));
   const findings = collectFindings(baseline, verdicts, jsOnly, renderError, spaShell);

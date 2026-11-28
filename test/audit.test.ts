@@ -120,6 +120,23 @@ test("a failing renderer is reported as a warning, not a crash", async () => {
   assert.ok(report.findings.some((f) => f.message.includes("browser closed unexpectedly")));
 });
 
+test("a failed render falls back to the shell heuristic instead of claiming ok", async () => {
+  const report = await auditUrl(`${fixture.base}/client-only`, one("GPTBot"), {
+    ...options,
+    renderer: async () => ({
+      ok: false,
+      error: "browserType.launch: Executable doesn't exist",
+      text: "",
+      wordCount: 0,
+      title: "",
+    }),
+  });
+  assert.equal(report.jsOnly, null);
+  assert.equal(report.verdicts[0]?.verdict, "js-dependent");
+  assert.equal(report.verdicts[0]?.confidence, "heuristic");
+  assert.match(report.verdicts[0]?.reason ?? "", /application shell/);
+});
+
 test("redirects are followed and recorded", async () => {
   const report = await auditUrl(`${fixture.base}/redirect`, one("GPTBot"), options);
   assert.equal(report.httpStatus, 200);
